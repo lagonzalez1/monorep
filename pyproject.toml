@@ -1,0 +1,17 @@
+[project]
+name = "tc-interview-problem-python-deps"
+version = "0.1.0"
+description = "Verse Python monorepo takehome"
+readme = "README.md"
+requires-python = ">=3.11"
+
+dependencies = [
+    "numpy==2.3.1",
+    "pandas==2.3.1",
+    "psutil==7.0.0",
+    "structlog==25.2.0",
+]
+
+[dependency-groups]
+dev = ["mypy==1.10.0", "ruff==0.4.5"]
+test = ["pytest==8.3.4", "pytest-cov==6.0.0", "pytest-mock==3.14.0"]
