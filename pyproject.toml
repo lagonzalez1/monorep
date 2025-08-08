@@ -9,7 +9,7 @@ dependencies = [
     "numpy==2.3.0",
     "pandas==2.3.1",
     "psutil==7.0.0",
-    "structlog==25.1.0",
+    "structlog==25.2.0",
 ]
 
 [dependency-groups]

@@ -7,6 +7,10 @@ ENRON_EMAIL_URL = "https://raw.githubusercontent.com/adriancampos1/Enron_Email_A
 ELECTRICITY_LOAD_DIAGRAM_URL = "https://archive.ics.uci.edu/static/public/321/electricityloaddiagrams20112014.zip"
 
 def download_and_extract():
+    """
+        Run download file using Download class
+        Return: None
+    """
     ENRON_STATUS = DownloadFile(ENRON_EMAIL_URL, 'csv')
     print("Enron download", ENRON_STATUS.download_file())
     ELECTRICITY_DIAGRAM = DownloadFile(ELECTRICITY_LOAD_DIAGRAM_URL, 'zip')
@@ -14,6 +18,10 @@ def download_and_extract():
 
 
 def align_python_deps():
+    """
+        Run update dependencies using DependencyManager class.
+        Returns: None
+    """
     al = DependencyManager()
     if al.alignment_available():
         possible_updates = al.update_pyproject()

@@ -29,17 +29,14 @@ class DependencyManager:
         "structlog": ["24.4.0", "25.1.0", "25.2.0"]
     }
     
-    
     def __init__(self):
-        # Get the current dep
         self.project_dependencies = self.load_pyproject_deps()
         self.package_updates = None
-        # If there are dep
         if self.project_dependencies:
             self.inject_base_dependencies()
             self.package_updates = self.find_alignment()
         else:
-            logging.info("No Dependencies")
+            print("No Dependencies")
         
     def alignment_available(self) ->bool:
         """
@@ -65,6 +62,7 @@ class DependencyManager:
                 else:
                     new_version = list(upgrades.values())[0]
                     dependencies[package] = new_version
+        
         return dependencies
     
     def remove_file(self, file_path: Path)->bool:
@@ -135,9 +133,9 @@ class DependencyManager:
             for idx, dep in enumerate(deps):
                 name, _ = dep.split("==", 1)
                 if name in self.package_updates:
-                    new_ver = self.package_updates[name]
-                    deps[idx] = f"{name}=={new_ver}"
-                    updates.append(f"{name}=={new_ver}")
+                    new_version = self.package_updates[name]
+                    deps[idx] = f"{name}=={new_version}"
+                    updates.append(f"{name}=={new_version}")
 
             proj_file.write_text(tomlkit.dumps(toml_data), encoding="utf-8")
         except (FileNotFoundError, tomlkit.TOMLKitError, OSError, shutil.Error) as e:
@@ -185,9 +183,6 @@ class DependencyManager:
             job_dir = apps_dir / f"{prefix}-{suffix}"
             dockerfile, dockerfile_temp = job_dir / self.DOCKERFILE, job_dir / self.DOCKERFILE_TEMP
             orig_text  = dockerfile.read_text().splitlines()
-            # extract current version 
-            #cur_ver = self.project_dependencies[package][2:]
-            # start from the current version index
             start_idx = self.upgrades[package].index(version)
             for candidate in self.upgrades[package][start_idx+1:]:
                 # build a temp Dockerfile
@@ -201,8 +196,6 @@ class DependencyManager:
                     else:
                         new_lines.append(ln)
                 dockerfile_temp.write_text("\n".join(new_lines)+"\n")
-
-                # try build+test
                 tag = f"verify-{prefix}-{suffix}-{candidate}"
                 try:
                     subprocess.run(
@@ -213,7 +206,6 @@ class DependencyManager:
                         ["docker", "run", "-d", tag],
                         cwd=parent_dir
                     ).decode().strip()
-                    logging.info("Container ID", container_id)
                     logs = subprocess.check_output(["docker", "logs", container_id]).decode()
                     if "Traceback" in logs or "ERROR" in logs:
                         break
@@ -246,7 +238,6 @@ class DependencyManager:
         proj = data.get("project", {})
         if isinstance(proj.get("dependencies"), list):
             for item in proj["dependencies"]:
-                # item is a string like "pkg==1.2.3" or "pkg>=1.0,<2.0"
                 req = Requirement(item)
                 result[req.name] = str(req.specifier)
             return result
