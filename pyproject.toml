@@ -6,10 +6,10 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 dependencies = [
-    "numpy==2.3.0",
-    "pandas==2.3.1",
-    "psutil==7.0.0",
-    "structlog==25.2.0",
+    "numpy==2.2.1",
+    "pandas==2.2.3",
+    "psutil==6.1.1",
+    "structlog==24.4.0",
 ]
 
 [dependency-groups]

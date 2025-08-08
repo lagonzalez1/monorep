@@ -70,8 +70,6 @@ this with `pyenv versions`
 
 ## Coding Assignment
 
-
-
 Files added:
   
   - requirements.txt
@@ -91,12 +89,23 @@ Files added:
 
   Downloads the static_data
   Upgrades the base dependencies if alignment is possible.
-  
+
+
   Reasoning on dependencies manager class:
-    Since i know my base dependancies ie (pyproject.toml)
-    I can check a new version of lets say numpy2.1.1 -> numpy2.3.0 with the rest of the same dependencies.
-    Checking the dependency by building an image and running the container. If no error arises then store package and version.
-    Alignment occurs when all numpy 2.3.0 successfully build and run accross len(apps). 
+    The purpose of the DependenciesManager is to manage and validate dependency upgrades across multiple applications within a monorepo.
+    
+    Since the base dependencies are already defined in pyproject.toml, we can use this as the foundation.
+    
+    When evaluating an upgrade—for example, updating numpy from version 2.1.1 to 2.3.0—we simulate the change by modifying only the target package version while keeping the rest of the dependencies intact.
+    
+    The updated environment is then validated by:
+	  	Building a Docker image for each app with the new dependency version.
+	  	Running the container to ensure the app starts and functions without error.
+	  
+    If the build and runtime succeed without exceptions, we consider the new dependency version valid for that app.
+    
+    Alignment is achieved when all apps within the monorepo (i.e., len(apps)) successfully build and run with the proposed dependency version. At that point, the new version can be recorded or promoted to pyproject.toml.
+    
 
 2. Bulding the python-base
   * Since the align_python_deps() function updates the base after alignment is complete, this step is not needed*
