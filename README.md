@@ -70,8 +70,7 @@ this with `pyenv versions`
 
 ## Coding Assignment
 
-If you downloaded or cloned this repository for the Live Coding track (Track A), you will be asked to implement the
-`align_python_deps()` method in `scripts/main.py`. Please see the `TODO(centerpiece)` in-lined.
+
 
 Files added:
   
@@ -92,6 +91,12 @@ Files added:
 
   Downloads the static_data
   Upgrades the base dependencies if alignment is possible.
+  
+  Reasoning on dependencies manager class:
+    Since i know my base dependancies ie (pyproject.toml)
+    I can check a new version of lets say numpy2.1.1 -> numpy2.3.0 with the rest of the same dependencies.
+    Checking the dependency by building an image and running the container. If no error arises then store package and version.
+    Alignment occurs when all numpy 2.3.0 successfully build and run accross len(apps). 
 
 2. Bulding the python-base
   * Since the align_python_deps() function updates the base after alignment is complete, this step is not needed*
@@ -106,6 +111,3 @@ Files added:
   - docker run -p 8000:8000 python-{job-a}
   - docker run -p 8000:8000 python-{server-one} 
 
-
-And if you have opted into the Take Home track (Track B), please follow the instructions in the
-`Case-Study-SWE-DistributedSystems-PythonDeps.pdf` you've been given.

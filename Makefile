@@ -1,44 +1,24 @@
-.PHONY: lint
+
+.PHONY: lint format
 lint:
-	# TODO(take-home-only)
 	ruff check .
+format:
+	ruff format .
 
 .PHONY: check
 check:
-	@echo "Directories"
-	@ls -d lib/ scripts/ test/
+	@echo "Directories in repo"
+	@ls -d lib/ scripts/ tests/ apps/ static_data/
 
-.PHONY: check
+
+.PHONY: test
 test:
 	python -m pytest tests
 
 .PHONY: build
-build-base:
+build base:
 	docker build . -f Dockerfile -t python-base
 
-
-# List all apps under apps/
-APPS := $(patsubst apps/%,%,$(wildcard apps/*))
-BASE_IMAGE := python-base
-
-.PHONY: all $(APPS:%=build-%)
-
-# Default target: build every app that has changed
-all: $(APPS:%=build-%)
-
-# build-<app> checks for git changes then builds
-build-%:
-	@echo "→ Checking changes for apps/$*"
-	@if git diff --quiet HEAD -- apps/$*; then \
-		echo "✔ No changes in apps/$*, skipping build"; \
-	else \
-		echo "⏳ Building $*..."; \
-		docker build \
-			--build-arg BASE_IMAGE=$(BASE_IMAGE) \
-			-t $*:latest \
-			-f apps/$*/Dockerfile .; \
-		echo "✅ Built apps/$*"; \
-	fi
 
 .PHONY: build all base server-one server-two job-a job-b job-c
 APP_ARG = $(word 2,$(MAKECMDGOALS))

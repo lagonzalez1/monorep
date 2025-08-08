@@ -10,7 +10,7 @@ from packaging.requirements import Requirement
 import logging
 
 
-class AlignDependencies:
+class DependencyManager:
     """
         Align dependancies by checking pyproject.toml dependancies
         Attempts to align, if possible update all
@@ -57,7 +57,7 @@ class AlignDependencies:
         dependencies = defaultdict(list)
         total_apps = self.get_apps_count()
         for package, version in self.load_pyproject_deps().items():
-            upgrades = self.search_dependencies_alignment(package)
+            upgrades = self.search_dependencies_alignment(package, version[2:])
             if len(upgrades.keys()) == total_apps:
                 # Check if the current version is in list
                 if version[2:] in upgrades.values():
@@ -94,7 +94,7 @@ class AlignDependencies:
             return False
         try:
             completed = subprocess.run(
-                ["make", "build-base"],
+                ["make", "build", "base"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,       
@@ -166,7 +166,7 @@ class AlignDependencies:
         return count
     
 
-    def search_dependencies_alignment(self, package: str)->defaultdict:
+    def search_dependencies_alignment(self, package: str, version: str)->defaultdict:
         """
             Given a package check if docker build and docker run succeeds. 
             Args: 
@@ -186,9 +186,9 @@ class AlignDependencies:
             dockerfile, dockerfile_temp = job_dir / self.DOCKERFILE, job_dir / self.DOCKERFILE_TEMP
             orig_text  = dockerfile.read_text().splitlines()
             # extract current version 
-            cur_ver = self.project_dependencies[package][2:]
+            #cur_ver = self.project_dependencies[package][2:]
             # start from the current version index
-            start_idx = self.upgrades[package].index(cur_ver)
+            start_idx = self.upgrades[package].index(version)
             for candidate in self.upgrades[package][start_idx+1:]:
                 # build a temp Dockerfile
                 new_lines = []

@@ -1,5 +1,5 @@
 from DownloadFile import DownloadFile
-from AlignDependencies import AlignDependencies
+from DependencyManager import DependencyManager
 import logging
 ##from lib.verse import common
 
@@ -12,25 +12,23 @@ def download_and_extract():
     ELECTRICITY_DIAGRAM = DownloadFile(ELECTRICITY_LOAD_DIAGRAM_URL, 'zip')
     print("Electricity download", ELECTRICITY_DIAGRAM.download_file())
 
+
 def align_python_deps():
-    al = AlignDependencies()
+    al = DependencyManager()
     if al.alignment_available():
         possible_updates = al.update_pyproject()
         if not possible_updates:        
-            logging.info("No alignment available")
+            print("No alignment available")
         update_project = al.test_pyproject()
         if update_project:
-            logging.info(" ".join([f'{update} ' for update in possible_updates]))
+            print(" ".join([f'{update} ' for update in possible_updates]))
     
-    logging.info("No alignment available")
+    print("No alignment available")
             
 
 def main():
-    # TODO remove this print() statement below once the above have been implemented
     download_and_extract()
     align_python_deps()
- 
-    # TODO provide CLI argument options/flags to invoke one of the desired methods above
 
 if __name__ == "__main__":
     main()
