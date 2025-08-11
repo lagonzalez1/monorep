@@ -2,3 +2,6 @@ tomlkit
 toml
 packaging
 ruff
+pandas
+psutil
+structlog

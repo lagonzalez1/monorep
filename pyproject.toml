@@ -12,6 +12,10 @@ dependencies = [
     "structlog==25.1.0",
 ]
 
-[dependency-groups]
+testpaths = [
+    "apps/job-a/tests", 
+]
+
+[project.optional-dependencies]
 dev = ["mypy==1.10.0", "ruff==0.4.5"]
 test = ["pytest==8.3.4", "pytest-cov==6.0.0", "pytest-mock==3.14.0"]

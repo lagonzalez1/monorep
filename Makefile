@@ -10,17 +10,33 @@ check:
 	@echo "Directories in repo"
 	@ls -d lib/ scripts/ tests/ apps/ static_data/
 
+.PHONY: test-base test-all test-job
+JOBS := $(notdir $(wildcard apps/*))
+test-base:
+	python -m pytest tests; 
 
-.PHONY: test
 test:
-	python -m pytest tests
+	@$(eval JOB_ARG = $(word 2,$(MAKECMDGOALS)))
+	@if [ "$(JOB_ARG)" = "all" ]; then \
+		echo "Running all tests"; \
+		python -m pytest apps/; \
+	elif echo "$(JOBS)" | grep -qw "$(JOB_ARG)"; then \
+		echo "Running tests for $(JOB_ARG)"; \
+		python -m pytest apps/$(JOB_ARG)/tests; \
+	else \
+		echo "Error: unknown job '$(JOB_ARG)'"; \
+		echo "Usage: make test [all|job_name]"; \
+		echo "Available jobs: $(JOBS)"; \
+		exit 1; \
+	fi
 
-.PHONY: build
+
+.PHONY: build base
 build base:
 	docker build . -f Dockerfile -t python-base
 
 
-.PHONY: build all base server-one server-two job-a job-b job-c
+.PHONY: build all base server-one server-two server-three job-a job-b job-c
 APP_ARG = $(word 2,$(MAKECMDGOALS))
 build:
 	@$(eval SUBAPPS := $(notdir $(wildcard apps/*)))

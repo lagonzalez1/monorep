@@ -80,6 +80,7 @@ Files added:
   - /server-two/requirements.txt
   - /scripts/AlignDependencies.py
   - /scripts/DownloadFile.py
+  - /server-three/app.py, Dockerfile, requirements.txt, service.proto
 
 
 ## Running this assignment
@@ -120,6 +121,17 @@ Files added:
   - docker run -p 8000:8000 python-{job-a}
   - docker run -p 8000:8000 python-{server-one} 
 
+
+
+# Testing
+  * Test the base tests path
+  - make test-base
+  * Test the jobs and servers
+  - make test job-a .. 
+  * Test all jobs
+  - make test all
+
+  
 
 # gRPC server-three
   grpcurl required to test out this endpoint.  Install direclty using Go, apt(ubuntu), homebrew(mac).. 

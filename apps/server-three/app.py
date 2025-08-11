@@ -11,15 +11,15 @@ class ServerThree(rpc.VerseServiceServicer):
         return pb.EchoReply(msg=request.msg)
 
     async def GetMemory(self, request, context):
-        return pb.MemReply( usage=get_memory_usage() )
-    
+        return pb.MemReply(usage=get_memory_usage())
+
 
 async def serve():
     server = grpc.aio.server()
     rpc.add_VerseServiceServicer_to_server(ServerThree(), server)
 
     SERVICE_NAMES = (
-        'demo.v1.VerseService',
+        "demo.v1.VerseService",
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server=server)
@@ -32,5 +32,3 @@ async def serve():
 
 if __name__ == "__main__":
     asyncio.run(serve())
-
-

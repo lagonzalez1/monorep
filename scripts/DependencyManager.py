@@ -1,8 +1,7 @@
-
 import os
 import shutil
 from pathlib import Path
-import subprocess  
+import subprocess
 import tomlkit
 import toml
 from collections import defaultdict
@@ -12,9 +11,10 @@ import logging
 
 class DependencyManager:
     """
-        Align dependancies by checking pyproject.toml dependancies
-        Attempts to align, if possible update all
+    Align dependancies by checking pyproject.toml dependancies
+    Attempts to align, if possible update all
     """
+
     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
     PYPROJECT_TOML = "pyproject.toml"
     PYPROJECT_TOML_BCK = "pyproject.toml.bck"
@@ -26,9 +26,9 @@ class DependencyManager:
         "numpy": ["2.2.1", "2.3.0", "2.3.1"],
         "pandas": ["2.2.3", "2.3.0", "2.3.1"],
         "psutil": ["6.1.1", "7.0.0"],
-        "structlog": ["24.4.0", "25.1.0", "25.2.0"]
+        "structlog": ["24.4.0", "25.1.0", "25.2.0"],
     }
-    
+
     def __init__(self):
         self.project_dependencies = self.load_pyproject_deps()
         self.package_updates = None
@@ -37,19 +37,18 @@ class DependencyManager:
             self.package_updates = self.find_alignment()
         else:
             print("No Dependencies")
-        
-    def alignment_available(self) ->bool:
+
+    def alignment_available(self) -> bool:
         """
-            Check if upgrades are available
-            Returns boolean
+        Check if upgrades are available
+        Returns boolean
         """
         return bool(self.package_updates)
 
-    
-    def find_alignment(self)->defaultdict:
+    def find_alignment(self) -> defaultdict:
         """
-            If alignment is possible update the Dockerfile and pyproject.toml 
-            Returns defaultdict of [{numpy: 'new_version'},..]
+        If alignment is possible update the Dockerfile and pyproject.toml
+        Returns defaultdict of [{numpy: 'new_version'},..]
         """
         dependencies = defaultdict(list)
         total_apps = self.get_apps_count()
@@ -62,13 +61,13 @@ class DependencyManager:
                 else:
                     new_version = list(upgrades.values())[0]
                     dependencies[package] = new_version
-        
+
         return dependencies
-    
-    def remove_file(self, file_path: Path)->bool:
+
+    def remove_file(self, file_path: Path) -> bool:
         """
-            Remove file given a path object.
-            Returns: boolean
+        Remove file given a path object.
+        Returns: boolean
         """
         try:
             file_path.unlink()
@@ -77,15 +76,16 @@ class DependencyManager:
             logging.info(f"Unable to remove file {file_path.name}, error {e}")
             return False
 
-
-    def test_pyproject(self) ->bool:
+    def test_pyproject(self) -> bool:
         """
-            Runs "make build-base" on newly created toml file.
+        Runs "make build-base" on newly created toml file.
         """
         if not self.alignment_available():
             return False
         pyproject_path = Path(self.CURRENT_DIR).resolve().parent / self.PYPROJECT_TOML
-        pyproject_path_backup = Path(self.CURRENT_DIR).resolve().parent / self.PYPROJECT_TOML_BCK
+        pyproject_path_backup = (
+            Path(self.CURRENT_DIR).resolve().parent / self.PYPROJECT_TOML_BCK
+        )
         if not pyproject_path_backup.exists():
             return False
         if not pyproject_path.exists():
@@ -95,8 +95,8 @@ class DependencyManager:
                 ["make", "build", "base"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                text=True,       
-                check=True       
+                text=True,
+                check=True,
             )
         except subprocess.CalledProcessError as e:
             logging.info("Build base failed with exit code", e)
@@ -108,7 +108,6 @@ class DependencyManager:
             logging.info("Output \n", completed.stdout)
             self.remove_file(pyproject_path_backup)
             return True
-
 
     def update_pyproject(self) -> list:
         """
@@ -145,13 +144,12 @@ class DependencyManager:
                 logging.info(f"Restored original from {backup_file}")
             return []
 
-        return updates  
-        
+        return updates
 
-    def get_apps_count(self)->int:
+    def get_apps_count(self) -> int:
         """
-            Get the number of apps in /apps directory by delimter "-"
-            Returns: int
+        Get the number of apps in /apps directory by delimter "-"
+        Returns: int
         """
         parent_dir = Path(self.CURRENT_DIR).resolve().parent
         apps_dir = parent_dir / self.APPS
@@ -162,13 +160,12 @@ class DependencyManager:
             if len(dir.name.split("-")) > 1:
                 count += 1
         return count
-    
 
-    def search_dependencies_alignment(self, package: str, version: str)->defaultdict:
+    def search_dependencies_alignment(self, package: str, version: str) -> defaultdict:
         """
-            Given a package check if docker build and docker run succeeds. 
-            Args: 
-            package : Check possible alignments for package prefix
+        Given a package check if docker build and docker run succeeds.
+        Args:
+        package : Check possible alignments for package prefix
         """
         parent_dir = Path(self.CURRENT_DIR).resolve().parent
         apps_dir = parent_dir / self.APPS
@@ -181,39 +178,53 @@ class DependencyManager:
                 continue
             prefix, suffix = directory_content[0], directory_content[1]
             job_dir = apps_dir / f"{prefix}-{suffix}"
-            dockerfile, dockerfile_temp = job_dir / self.DOCKERFILE, job_dir / self.DOCKERFILE_TEMP
-            orig_text  = dockerfile.read_text().splitlines()
+            dockerfile, dockerfile_temp = (
+                job_dir / self.DOCKERFILE,
+                job_dir / self.DOCKERFILE_TEMP,
+            )
+            orig_text = dockerfile.read_text().splitlines()
             start_idx = self.upgrades[package].index(version)
-            for candidate in self.upgrades[package][start_idx+1:]:
+            for candidate in self.upgrades[package][start_idx + 1 :]:
                 # build a temp Dockerfile
                 new_lines = []
                 for ln in orig_text:
                     if ln.strip().startswith("FROM python-base"):
                         new_lines.append(ln)
-                        new_lines.extend([
-                            f"RUN pip install {package}=={candidate} pytest",
-                        ])
+                        new_lines.extend(
+                            [
+                                f"RUN pip install {package}=={candidate} pytest",
+                            ]
+                        )
                     else:
                         new_lines.append(ln)
-                dockerfile_temp.write_text("\n".join(new_lines)+"\n")
+                dockerfile_temp.write_text("\n".join(new_lines) + "\n")
                 tag = f"verify-{prefix}-{suffix}-{candidate}"
                 try:
                     subprocess.run(
-                        ["docker", "build", "-f", str(dockerfile_temp), "-t", tag, '.'],
-                        cwd=parent_dir, check=True, stdout=subprocess.DEVNULL
+                        ["docker", "build", "-f", str(dockerfile_temp), "-t", tag, "."],
+                        cwd=parent_dir,
+                        check=True,
+                        stdout=subprocess.DEVNULL,
                     )
-                    container_id = subprocess.check_output(
-                        ["docker", "run", "-d", tag],
-                        cwd=parent_dir
-                    ).decode().strip()
-                    logs = subprocess.check_output(["docker", "logs", container_id]).decode()
+                    container_id = (
+                        subprocess.check_output(
+                            ["docker", "run", "-d", tag], cwd=parent_dir
+                        )
+                        .decode()
+                        .strip()
+                    )
+                    logs = subprocess.check_output(
+                        ["docker", "logs", container_id]
+                    ).decode()
                     if "Traceback" in logs or "ERROR" in logs:
                         break
                     key = f"{prefix}-{suffix}"
                     successful[key] = candidate
                     break
                 except subprocess.CalledProcessError:
-                    logging.info(f"{prefix}-{suffix} failed with {package}=={candidate}")
+                    logging.info(
+                        f"{prefix}-{suffix} failed with {package}=={candidate}"
+                    )
                 finally:
                     dockerfile_temp.unlink(missing_ok=True)
                     subprocess.run(["docker", "stop", container_id], check=False)
@@ -224,14 +235,13 @@ class DependencyManager:
 
         return successful
 
-
-    def load_pyproject_deps(self)->dict[str, str]:
+    def load_pyproject_deps(self) -> dict[str, str]:
         """
-            Return a base dependencies dictionary from pyproject.toml file.
-            Returns: 
-                dict {"pandas==1.2.3", "numpy==1.2.3"}
+        Return a base dependencies dictionary from pyproject.toml file.
+        Returns:
+            dict {"pandas==1.2.3", "numpy==1.2.3"}
         """
-        PROJECT_ROOT = Path(__file__).resolve().parent.parent             
+        PROJECT_ROOT = Path(__file__).resolve().parent.parent
         pyproject_file = PROJECT_ROOT / self.PYPROJECT_TOML
         data = toml.loads(pyproject_file.read_text())
         result: dict[str, str] = {}
@@ -243,14 +253,13 @@ class DependencyManager:
             return result
         return None
 
-
-    def inject_deps_once(self, dockerfile: Path, deps: dict[str, str])->bool:
+    def inject_deps_once(self, dockerfile: Path, deps: dict[str, str]) -> bool:
         """
         Checks if dependencies have already been injected into the Dockerfile.
         Args:
             Dockerfile: Path to the Dockerfile
             Deps: Dictionary of package dependencies (e.g., {"numpy": "==1.21.0"})
-        
+
         Returns:
             bool: True if all dependencies are found, False otherwise
         """
@@ -260,7 +269,6 @@ class DependencyManager:
             return False
         dep_patterns = [f"{pkg}{ver}" for pkg, ver in deps.items()]
         return all(pattern in text for pattern in dep_patterns)
-            
 
     def inject_base_dependencies(self) -> bool:
         """
@@ -296,11 +304,3 @@ class DependencyManager:
                 any_injected = True
 
         return any_injected
-    
-
-            
-            
-        
-
-
-
