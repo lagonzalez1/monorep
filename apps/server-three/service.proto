@@ -1,0 +1,14 @@
+// service.proto
+syntax = "proto3";
+package demo.v1;
+
+service VerseService {
+  rpc Echo (EchoRequest) returns (EchoReply);
+  rpc GetMemory (MemRequest) returns (MemReply);
+}
+
+message EchoRequest { string msg = 1; }
+message EchoReply   { string msg = 1; }
+
+message MemRequest {}
+message MemReply   { double usage = 1; }
