@@ -8,29 +8,43 @@ tc-interview-problem-python-deps
 ├── .git
 ├── .gitignore
 ├── Dockerfile
+├── requirements.txt
 ├── Makefile
 ├── README.md
 ├── apps
 │   ├── job-a
 │   │   ├── Dockerfile
+│   │   ├── requirements.txt
 │   │   └── app.py
 │   ├── job-b
 │   │   ├── Dockerfile
+│   │   ├── requirements.txt
 │   │   └── app.py
 │   ├── job-c
 │   │   ├── Dockerfile
+│   │   ├── requirements.txt
 │   │   └── app.py
 │   ├── server-one
 │   │   ├── Dockerfile
+│   │   ├── requirements.txt
 │   │   └── app.py
-│   └── server-two
-│       ├── Dockerfile
-│       └── app.py
+│   ├── server-one
+│   │   ├── Dockerfile
+│   │   ├── requirements.txt
+│   │   └── app.py
+|   ├───server-three
+│   |   ├── Dockerfile
+│   │   ├── requirements.txt
+│   │   ├── service.proto
+│       └── app.py
 ├── lib
 │   └── verse
 │       └── common.py
 ├── pyproject.toml
 ├── scripts
+│   ├── DependencyManager.py
+│   ├── DownloadFile.py
+│   ├── download_static_data.sh
 │   └── main.py
 ├── static_data
 │   ├── enron_emails_1702.csv
@@ -67,6 +81,11 @@ which python
 TODO: please paste all the versions of Python you have installed, e.g. if you have `pyenv` installed you can obtain
 this with `pyenv versions`
 
+## Docker * Docker must be running * 
+
+
+## Install base dependencies to virtual env
+- $pip install -r requirements.txt
 
 ## Coding Assignment
 
@@ -82,11 +101,6 @@ Files added:
   - /scripts/DownloadFile.py
   - /server-three/app.py, Dockerfile, requirements.txt, service.proto
 
-## Install base dependencies
-* Docker must be running * 
-- install pip install -r requirements.txt
-
-
 ## Running this assignment
 
 
@@ -98,48 +112,48 @@ Files added:
 
 
   Reasoning on dependencies manager class:
-    The purpose of the DependenciesManager is to manage and validate dependency upgrades across multiple applications within a monorepo.
-    
-    Since the base dependencies are already defined in pyproject.toml, we can use this as the foundation.
-    
-    When evaluating an upgrade—for example, updating numpy from version 2.1.1 to 2.3.0—we simulate the change by modifying only the target package version while keeping the rest of the dependencies intact.
-    
-    The updated environment is then validated by:
-	  	Building a Docker image for each app with the new dependency version.
-	  	Running the container to ensure the app starts and functions without error.
-	  
-    If the build and runtime succeed without exceptions, we consider the new dependency version valid for that app.
-    
-    Alignment is achieved when all apps within the monorepo (i.e., len(apps)) successfully build and run with the proposed dependency version. At that point, the new version can be recorded or promoted to pyproject.toml.
+  The purpose of the DependenciesManager is to manage and validate dependency upgrades across multiple applications within a monorepo.
+  
+  Since the base dependencies are already defined in pyproject.toml, we can use this as the foundation.
+  
+  When evaluating an upgrade—for example, updating numpy from version 2.1.1 to 2.3.0—we simulate the change by modifying only the target package version while keeping the rest of the dependencies intact.
+  
+  The updated environment is then validated by:
+  Building a Docker image for each app with the new dependency version.
+  Running the container to ensure the app starts and functions without error.
+  
+  If the build and runtime succeed without exceptions, we consider the new dependency version valid for that app.
+  
+  Alignment is achieved when all apps within the monorepo (i.e., len(apps)) successfully build and run with the proposed dependency version. At that point, the new version can be recorded or promoted to pyproject.toml.
     
 
 2. Bulding the python-base
   * Since the align_python_deps() function updates the base after alignment is complete, this step is not needed*
-  - make build-base
+  - $ make build base
 
 3. Build jobs, servers...
-  - make build job-a
-  - make build all
+  - $ make build job-a
+  - $ make build server-one
+  - $ make build all
 
 # Note: tags are python-{$apps-dir-name}
 4. Running the jobs, servers...
-  - docker run -p 8000:8000 python-{job-a}
-  - docker run -p 8000:8000 python-{server-one} 
-
-
-# Testing
-  * Test the base tests path
-  - make test-base
-  * Test the jobs and servers
-  - make test job-a .. 
-  * Test all jobs
-  - make test all
+  - $ docker run -p 8000:8000 python-{job-a}
+  - $ docker run -p 8000:8000 python-{server-one} 
 
 
 # gRPC server-three
   grpcurl required to test out this endpoint.  Install direclty with Go, apt(ubuntu), homebrew(mac).. 
   To run:
-  - docker run -p 8080:5000 ptyhon-server-three
+  - $ docker run -p 8080:5000 ptyhon-server-three
   To test endpoint
-  - grpcurl -plaintext -d '{"msg": "Hello world"}' localhost:8080 demo.v1.VerseService/Echo
-  - grpcurl -plaintext -d '{}' localhost:8080 demo.v1.VerseService/GetMemory
+  - $ grpcurl -plaintext -d '{"msg": "Hello world"}' localhost:8080 demo.v1.VerseService/Echo
+  - $ grpcurl -plaintext -d '{}' localhost:8080 demo.v1.VerseService/GetMemory
+
+# Testing
+  * Test the base tests path
+    - $ make test-base
+  * Test the jobs and servers
+    - $ make test job-a .. 
+  * Test all jobs
+    - $ make test all

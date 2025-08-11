@@ -26,9 +26,9 @@ async def serve():
 
     server.add_insecure_port("0.0.0.0:5000")
     await server.start()
-    print("gRPC server running on port 5000")
     await server.wait_for_termination()
 
 
 if __name__ == "__main__":
+    print("gRPC server running on port 5000")
     asyncio.run(serve())
