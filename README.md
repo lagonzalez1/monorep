@@ -82,8 +82,13 @@ Files added:
   - /scripts/DownloadFile.py
   - /server-three/app.py, Dockerfile, requirements.txt, service.proto
 
+## Install base dependencies
+* Docker must be running * 
+- install pip install -r requirements.txt
+
 
 ## Running this assignment
+
 
 1. Download data
   - Run python scripts/main.py
@@ -122,7 +127,6 @@ Files added:
   - docker run -p 8000:8000 python-{server-one} 
 
 
-
 # Testing
   * Test the base tests path
   - make test-base
@@ -131,10 +135,9 @@ Files added:
   * Test all jobs
   - make test all
 
-  
 
 # gRPC server-three
-  grpcurl required to test out this endpoint.  Install direclty using Go, apt(ubuntu), homebrew(mac).. 
+  grpcurl required to test out this endpoint.  Install direclty with Go, apt(ubuntu), homebrew(mac).. 
   To run:
   - docker run -p 8080:5000 ptyhon-server-three
   To test endpoint

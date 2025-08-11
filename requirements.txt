@@ -5,3 +5,4 @@ ruff
 pandas
 psutil
 structlog
+pytest

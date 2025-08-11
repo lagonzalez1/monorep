@@ -10,8 +10,8 @@ check:
 	@echo "Directories in repo"
 	@ls -d lib/ scripts/ tests/ apps/ static_data/
 
-.PHONY: test-base test-all test-job
-JOBS := $(notdir $(wildcard apps/*))
+.PHONY: test
+ALLOWED := job-a job-b job-c server-one server-two server-three test-base
 test-base:
 	python -m pytest tests; 
 
@@ -21,7 +21,8 @@ test:
 		echo "Running all tests"; \
 		python -m pytest apps/; \
 	elif echo "$(JOBS)" | grep -qw "$(JOB_ARG)"; then \
-		echo "Running tests for $(JOB_ARG)"; \
+		echo "Running tests for $(JOB_ARG)" and installing dependencies; \
+		pip install -r apps/$(JOB_ARG)/requirements.txt &&  \
 		python -m pytest apps/$(JOB_ARG)/tests; \
 	else \
 		echo "Error: unknown job '$(JOB_ARG)'"; \
