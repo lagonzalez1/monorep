@@ -1,5 +1,5 @@
-import asyncio, psutil, grpc
-from concurrent import futures
+import asyncio
+import grpc
 import service_pb2 as pb
 import service_pb2_grpc as rpc
 from verse.common import get_memory_usage

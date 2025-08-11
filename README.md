@@ -120,3 +120,11 @@ Files added:
   - docker run -p 8000:8000 python-{job-a}
   - docker run -p 8000:8000 python-{server-one} 
 
+
+# gRPC server-three
+  grpcurl required to test out this endpoint.  Install direclty using Go, apt(ubuntu), homebrew(mac).. 
+  To run:
+  - docker run -p 8080:5000 ptyhon-server-three
+  To test endpoint
+  - grpcurl -plaintext -d '{"msg": "Hello world"}' localhost:8080 demo.v1.VerseService/Echo
+  - grpcurl -plaintext -d '{}' localhost:8080 demo.v1.VerseService/GetMemory

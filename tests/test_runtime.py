@@ -1,6 +1,5 @@
 import unittest
 import sys
-import os
 
 
 class TestRuntime(unittest.TestCase):

@@ -1,6 +1,5 @@
 from DownloadFile import DownloadFile
 from DependencyManager import DependencyManager
-import logging
 ##from lib.verse import common
 
 ENRON_EMAIL_URL = "https://raw.githubusercontent.com/adriancampos1/Enron_Email_Analysis/master/data/enron_emails_1702.csv"
